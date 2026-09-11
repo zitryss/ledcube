@@ -161,6 +161,8 @@ There is no maintenance-off endpoint. Reboot the Pico after upload to return to 
 
 ## MicroPython
 
+Apply the guidelines below when writing or reviewing the Pico/device files: `boot.py`, `main.py`, `lib/umqtt/__init__.py`, `lib/umqtt/simple.py`, and all `examples/*.py` files (the device demos, shared LED helper, and configuration templates). They also apply to the ignored local device configuration files `WIFI_CONFIG.py`, `MQTT_CONFIG.py`, and `webrepl_cfg.py`, and any future Python file intended to run on the Pico. Review these files under MicroPython guidelines, including `webrepl_cfg.py` even though host helpers also read it.
+
 - Indent with 4 spaces, never tabs
 - Follow PEP 8 style guide
 - Prefer absolute imports over relative imports
@@ -189,3 +191,33 @@ There is no maintenance-off endpoint. Reboot the Pico after upload to return to 
 - Never silently swallow a broad `except Exception`; report or recover from the failure explicitly and re-raise when appropriate
 - Use `pytest` on the development computer for host-side tests
 - Organize imports at the top of a file, followed by constants, then classes and functions, with `if __name__ == "__main__"` at the bottom
+
+## Python
+
+Apply the guidelines below when writing or reviewing the host-only CPython files: `webrepl_upload.py`, `webrepl_reset.py`, `tests/__init__.py`, and `tests/test_sensor_unknown.py`, plus future host-only tests and development or automation helpers. The tests run on the development computer, so these Python guidelines apply even when they test mocked device code. The MicroPython guidelines above apply to the device files; the Python guidelines below apply only to this host-only group.
+
+- Indent with 4 spaces, never tabs
+- Follow PEP 8 style guide
+- ALWAYS apply type hints to ALL function and variables annotations
+- Prefer absolute imports over relative imports
+- Avoid wildcard imports `from module import *`
+- Provide default arguments in functions where applicable
+- Never use mutable objects as default function arguments
+- Use f-strings for string formatting
+- Always use double-quoted strings (`"`) — never single-quoted (`'`)
+- Always add a trailing comma after the last item in any multi-line collection, function definition, or function call
+- Use list, dictionary, set, and generator comprehensions when it improves code readability
+- Use context managers `with` for file operations and resource management
+- Use `pathlib` instead of `os.path` for filesystem path-related operations
+- Use logging instead of print statements for errors and debugging
+- Never use bare `except:` statements
+- Catch specific exceptions rather than broad try/except blocks
+- Use `pytest` for testing
+- Use `dataclass` for data containers
+- Organize imports at the top of a file, followed by constants, then classes and functions, with `if __name__ == "__main__"` at the bottom
+- Use PEP 585 built-in generics such as `list[int]` and `dict[str, float]` instead of their `typing` equivalents
+- Use concrete type annotations; reserve `Any` for cases where an unconstrained type is truly needed
+- Use a named logger created with `logging.getLogger(__name__)` for each module instead of calling the root logger directly; `print()` is acceptable for intentional command-line output
+- For logging messages, pass values as logging arguments with %-style placeholders or through `extra` instead of using f-strings
+- Raise specific built-in or domain-specific exceptions rather than a generic `Exception`
+- If a broad exception catch is necessary, re-raise the exception or preserve its traceback with `logger.exception()` or `exc_info=True`; never silently swallow it
